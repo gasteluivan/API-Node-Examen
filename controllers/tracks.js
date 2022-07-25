@@ -1,6 +1,7 @@
 const { matchedData } = require("express-validator");
 const { tracksModel } = require("../models");
-const {handleHttpError} = require("../middleware/handleError");
+const {handleHttpError} = require("../utils/handleError");
+
 
 // lista de todos los tracks
 const getItems = async (req, res) => {
@@ -13,13 +14,22 @@ const getItems = async (req, res) => {
 };
 
 // obtener un track por id
-const getItem = (req, res) => {};
+const getItem = async (req, res) => {
+  try {
+    req  = matchedData(req);
+    const {id} = req;
+    const data = await tracksModel.findById(id);
+    res.send({ data });
+  } catch (e) {
+    handleHttpError(res, "ERROR GET ITEM", e.code);
+  }
+};
 
 // crea un track
 const createItem = async (req, res) => {
   try {
     const body = matchedData(req);
-    const data = await tracksModels.create(body);
+    const data = await tracksModel.create(body);
     res.send({ data });
   } catch (e) {
     handleHttpError(res, "ERROR CREANDO ITEM", e.code);
@@ -27,9 +37,29 @@ const createItem = async (req, res) => {
 };
 
 // actualiza un track
-const updateItem = (req, res) => {};
+const updateItem = async (req, res) => {
+  try {
+    const { id, ...body} = matchedData(req);
+    const data = await tracksModel.findOneAndUpdate(
+      id, body
+    );
+    res.send({ data });
+  } catch (e) {
+    handleHttpError(res, "ERROR UPDATE ITEM", e.code);
+  }
+};
 
 // elimina un track
-const deleteItem = (req, res) => {};
+const deleteItem = async (req, res) => {
+  try {
+    req  = matchedData(req);
+    const {id} = req;
+    const data = await tracksModel.delete({_id:id});
+    res.send({ data });
+  } catch (e) {
+    console.log(e);
+    handleHttpError(res, "ERROR DELETE ITEM", e.code);
+  }
+};
 
 module.exports = { getItems, getItem, createItem, updateItem, deleteItem };
