@@ -6,8 +6,9 @@ const {handleHttpError} = require("../utils/handleError");
 // lista de todos los tracks
 const getItems = async (req, res) => {
   try {
+    const user = req.user;
     const data = await tracksModel.find();
-    res.send({ data });
+    res.send({ data, user });
   } catch (e) {
     handleHttpError(res, "ERROR GET ITEMS", e.code);
   }

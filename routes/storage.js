@@ -1,8 +1,9 @@
 const express = require('express');
+const { matchedData } = require('express-validator');
 const router = express.Router();
 const uploadMidleware = require('../utils/handleStorage');
 const {validatorGetItem} = require("../validators/storage");
-const { getItem, getItems, updateItem, deleteItem, createItem } = require('../controllers/storage');
+const { getItem, getItems, deleteItem, createItem } = require('../controllers/storage');
 
 
 // lista de items
@@ -15,8 +16,6 @@ router.get('/:id', validatorGetItem, getItem);
 router.delete('/:id', validatorGetItem, deleteItem);
 
 // crea un item
-router.post('/', uploadMidleware.single("myfile"),(req,res) =>{
-    res.send({a:req.file});
-});
+router.post('/', uploadMidleware.single("myfile"), createItem);
 
-module.exports = router;    
+module.exports = router;     
