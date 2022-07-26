@@ -1,6 +1,8 @@
 const { handleHttpError } = require("../utils/handleError");
 const { verifyToken } = require("../utils/handleJwt");
 const { usersModel } = require("../models");
+const getProperties = require("../utils/handlePropetiesEngine");
+const propertiesKey = getProperties();
 
 const authMiddleware = async (req, res, next) => {
   try {
@@ -12,12 +14,16 @@ const authMiddleware = async (req, res, next) => {
     const token = req.headers.authorization.split(" ").pop();
     const dataToken = await verifyToken(token);
 
-    if (!dataToken._id) {
-      handleHttpError(res, "El token no es válido", 401);
+    if (!dataToken) {
+      handleHttpError(res, "NOT PAYLOAD DATA", 401);
       return;
     }
 
-    const user = await usersModel.findById(dataToken._id);
+    const query = {
+      [propertiesKey.id]: dataToken[propertiesKey.id],
+    }
+
+    const user = await usersModel.findOne(query);
     req.user = user;
 
     next();
